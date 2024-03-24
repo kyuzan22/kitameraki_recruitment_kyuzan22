@@ -1,29 +1,30 @@
 import React, { useState } from 'react';
 import { TextField, PrimaryButton, Stack, Checkbox } from '@fluentui/react';
-import TimePickerDateTimePicker from './DateTimePicker';
-
+import DateTimePicker from './DateTimePicker';
+import "../styles/transition.css";
+import useTasks from '../hooks/useTask';
 
 const stackTokens = { childrenGap: 10 };
 
 const TaskForm = ({ addTask }) => {
-  const [title, setTitle] = useState('');
+  const [taskTitle, setTaskTitle] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [description, setDescription] = useState('');
+  const [taskDescription, setTaskDescription] = useState('');
   const [hasDeadline, setHasDeadline] = useState(false);
   const [deadline, setDeadline] = useState(null);
-  
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!title.trim()){
-        setErrorMessage('Please input something')
-        return
+    if (!taskTitle.trim()) {
+      setErrorMessage('Please input something');
+      return;
     };
-    const newTitle = title.trim();
-    const newDesc = description.trim();
-    addTask({ title: newTitle, description: newDesc, deadline: hasDeadline ? deadline : null });
-    setErrorMessage('')
-    setTitle('');
-    setDescription('');
+    const newTitle = taskTitle.trim();
+    const newDesc = taskDescription.trim();
+    addTask(newTitle, newDesc, hasDeadline ? deadline : null);
+    setErrorMessage('');
+    setTaskTitle('');
+    setTaskDescription('');
     setHasDeadline(false);
     setDeadline(null);
   };
@@ -34,8 +35,8 @@ const TaskForm = ({ addTask }) => {
         <TextField
           label="Task Name"
           placeholder="Put your task here"
-          value={title}
-          onChange={(e) => { setTitle(e.target.value); setErrorMessage(''); }}
+          value={taskTitle}
+          onChange={(e) => { setTaskTitle(e.target.value); setErrorMessage(''); }}
           errorMessage={errorMessage}
           required
         />
@@ -44,22 +45,28 @@ const TaskForm = ({ addTask }) => {
           placeholder="Please enter task detail here"
           multiline
           autoAdjustHeight
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          value={taskDescription}
+          onChange={(e) => setTaskDescription(e.target.value)}
         />
         <Checkbox
           label="Set Deadline"
           checked={hasDeadline}
           onChange={(e) => setHasDeadline(e.target.checked)}
         />
-        {hasDeadline && (
-          <TimePickerDateTimePicker
+        {/* {hasDeadline && ( */}
+        <div style={{
+          transition: 'opacity 0.5s ease-in-out', // Example transition property
+          opacity: hasDeadline ? 1 : 0, // Adjust the opacity based on the hasDeadline state
+          visibility: hasDeadline ? 'visible' : 'hidden' // Toggle visibility based on the hasDeadline state
+        }}>
+          <DateTimePicker
             editData={false}
-            currentdeadLine={deadline}
-            onSelectDateTime={(time) => {setDeadline(time)}}
+            currentDeadLine={deadline}
+            onSelectDateTime={(time) => { setDeadline(time) }}
           />
-        )}
-        <PrimaryButton type="submit" style={{ width: 'fit-content' }}>Add Task</PrimaryButton>
+        </div>
+        {/* )} */}
+        <PrimaryButton type="submit" style={{transition: '0.5s ease-in-out', marginTop: hasDeadline ? 0 : '-65px',  width: 'fit-content' }}>Add Task</PrimaryButton>
       </Stack>
     </form>
   );

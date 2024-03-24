@@ -4,22 +4,22 @@ import { Dialog, DialogType, DialogFooter, PrimaryButton, DefaultButton } from '
 const DeleteConfirmationDialog = ({ hidden, onDismiss, onConfirm }) => {
     return (
         <Dialog
-            hidden={hidden}
-            onDismiss={onDismiss}
+            hidden={hidden} 
+            onDismiss={onDismiss} 
             dialogContentProps={{
-                type: DialogType.normal,
-                title: 'Delete Task',
-                subText: 'Are you sure you want to delete the task?',
+                type: DialogType.normal, 
+                title: 'Delete Task', 
+                subText: 'Are you sure you want to delete the task?', 
             }}
             modalProps={{
-                isBlocking: true,
-                topOffsetFixed: true,
+                isBlocking: true, 
+                topOffsetFixed: true, 
             }}
         >
-            <DialogFooter>
-                <PrimaryButton onClick={onConfirm} text="Delete" />
-                <DefaultButton onClick={onDismiss} text="Cancel" />
-            </DialogFooter>
+            <DialogFooter> 
+                <PrimaryButton onClick={onConfirm} text="Delete" /> 
+                <DefaultButton onClick={onDismiss} text="Cancel" /> 
+            </DialogFooter> 
         </Dialog>
     );
 };

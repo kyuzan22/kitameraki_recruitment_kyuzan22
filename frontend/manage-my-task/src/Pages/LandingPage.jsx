@@ -1,49 +1,43 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import TaskForm from '../components/TaskForm.jsx';
 import TaskList from '../components/TaskList.jsx';
 import InfiniteScroll from '../components/InfiniteScroll.jsx';
-import { initializeIcons } from '@fluentui/react/lib/Icons';
+import useTasks from '../hooks/useTask.js';
+import { IconButton, Icon, Stack } from '@fluentui/react';
 
 const MainPage = () => {
-  const [tasks, setTasks] = useState([]);
+  const [dataChange, setDataChange] = useState(true);
+  const [isHorizontal, setIsHorizontal] = useState(true);
+
+  const { tasks, fetchTasks, addTask, editTask, deleteTask, loading } = useTasks(setDataChange);
+
+  useEffect(() => {
+    if (dataChange) {
+      fetchTasks()
+      setDataChange(false)
+    }
+  }, [dataChange]);
+  
+  const toggleOrientation = () => {
+    setIsHorizontal(!isHorizontal);
+  };
+
   const loadMore = () => {
     console.log('Loading more tasks...');
-  };
-
-  const addTask = (newTask) => {
-    setTasks([...tasks, { ...newTask, id: Date.now() }]);
-  };
-
-  const deleteTask = (taskId) => {
-    setTasks(tasks.filter(task => task.id !== taskId));
-  };
-
-  const editTask = (taskId, newTitle, newDescription,newDeadline) => {
-    setTasks(tasks.map(task => {
-      if (task.id === taskId) {
-        return {
-          ...task,
-          title: newTitle !== undefined ? newTitle : task.title,
-          description: newDescription !== undefined ? newDescription : task.description,
-          deadline: newDeadline,
-        };
-      }
-      return task;
-    }));
-    console.log("this is task ")
-    console.log(tasks)
   };
 
   return (
     <div className="container">
       <h1>Task Management App</h1>
-      <div className="task-form">
-        <TaskForm addTask={addTask} />
-      </div>
-      <h3 style={{marginBottom:'10px'}}>Your Tasks</h3>
+      <TaskForm addTask={addTask} />
+      <Stack horizontal horizontalAlign="space-between" style={{ alignItems: 'center' }}>
+        <h3>Your Tasks</h3>
+        <IconButton iconProps={{ iconName: isHorizontal ? 'QuickNote' : 'BulletedList' }} onClick={toggleOrientation} />
+      </Stack>
       <div className="task-list">
         <InfiniteScroll loadMore={loadMore}>
-          <TaskList tasks={tasks} deleteTask={deleteTask} editTask={editTask} />
+          <TaskList tasks={tasks} deleteTask={deleteTask} editTask={editTask} isHorizontal={isHorizontal} />
+          {loading && <p>Loading tasks...</p>}
         </InfiniteScroll>
       </div>
     </div>

@@ -3,59 +3,51 @@ import { Stack } from '@fluentui/react';
 import { TextField } from '@fluentui/react/lib/TextField';
 import { Checkbox } from '@fluentui/react/lib/Checkbox';
 import TaskNote from './TaskNotes';
-import DetailTaskDialog from './DetailTaskDialog';
-import DeleteConfirmationDialog from './DeleteConfirmationDialog';
-import TimePickerDateTimePicker from './DateTimePicker';
+import DetailTaskDialog from './DetailTaskDialog'; 
+import DeleteConfirmationDialog from './DeleteConfirmationDialog'; 
+import TimePickerDateTimePicker from './DateTimePicker'; 
 
-const stackTokens = { childrenGap: 40 };
+const TaskList = ({ tasks, deleteTask, editTask, isHorizontal }) => {
+    const [dialogContent, setDialogContent] = useState(null); 
+    const [hideDialog, setHideDialog] = useState(true); 
+    const [editMode, setEditMode] = useState(false); 
+    const [currentTask, setCurrentTask] = useState(null); 
+    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false); 
+    const [hasDeadline, setHasDeadline] = useState(false); 
+    const [originalDeadline, setOriginalDeadline] = useState(null); 
 
-const TaskList = ({ tasks, deleteTask, editTask }) => {
-    const [dialogContent, setDialogContent] = useState(null);
-    const [hideDialog, setHideDialog] = useState(true);
-    const [editMode, setEditMode] = useState(false);
-    const [currentTask, setCurrentTask] = useState(null);
-    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
-    const [selectedTasks, setSelectedTasks] = useState([]);
-    const [hasDeadline, setHasDeadline] = useState(false);
-    const [originalDeadline, setOriginalDeadline] = useState(null);
+    const stackTokens = { childrenGap: isHorizontal ? 40 : 5 }; 
 
     useEffect(() => {
         if (currentTask) {
-            setHasDeadline(!!currentTask.deadline);
-            setOriginalDeadline(currentTask.deadline);
-            console.log("this is current")
-            console.log(currentTask)
+            setHasDeadline(!!currentTask.deadline); 
+            currentTask.deadline ? setOriginalDeadline(new Date(currentTask.deadline)) : setOriginalDeadline(null); 
         }
     }, [hideDialog]);
 
     useEffect(() => {
         if (currentTask) {
-            setDialogContent(renderDialogContent(currentTask));
-            console.log("this is current deadline")
-            console.log(currentTask.deadline)
-            if (!editMode) {
-                editTask(currentTask.id, currentTask.title, currentTask.description, originalDeadline);
-            }
+            setDialogContent(renderDialogContent(currentTask)); 
         }
     }, [hasDeadline, currentTask, editMode]);
 
-    const handleTitleChange = (e) => {
+    const handleTitleChange = (e) => { 
         const newTitle = e.target.value;
         setCurrentTask(prevTask => ({ ...prevTask, title: newTitle }));
     };
 
-    const handleDescriptionChange = (e) => {
+    const handleDescriptionChange = (e) => { 
         const newDescription = e.target.value;
         setCurrentTask(prevTask => ({ ...prevTask, description: newDescription }));
     };
 
-    const handleDeadlineChange = (time) => {
+    const handleDeadlineChange = (time) => { 
         const newDeadline = time;
         setCurrentTask(prevTask => ({ ...prevTask, deadline: newDeadline }));
         setOriginalDeadline(time);
     };
 
-    const handleCheckboxChange = (e) => {
+    const handleCheckboxChange = (e) => { 
         const isChecked = e.target.checked;
         setHasDeadline(isChecked);
         if (!isChecked && editMode) {
@@ -64,37 +56,27 @@ const TaskList = ({ tasks, deleteTask, editTask }) => {
         }
     };
 
-    const openDeleteConfirmation = () => {
+    const openDeleteConfirmation = () => { 
         setShowDeleteConfirmation(true);
     };
 
-    const closeDeleteConfirmation = () => {
+    const closeDeleteConfirmation = () => { 
         setShowDeleteConfirmation(false);
     };
 
-    const confirmEditTasks = () => {
-        setEditMode(!editMode)
-    };
-
-    const confirmAllDeleteTasks = () => {
-        selectedTasks.forEach(taskId => deleteTask(taskId));
-        closeDeleteConfirmation();
-        setSelectedTasks([]);
-    };
-
-    const confirmDeleteTasks = () => {
+    const confirmDeleteTasks = () => { 
         deleteTask(currentTask.id);
         setHideDialog(true);
         setCurrentTask(null);
         closeDeleteConfirmation();
     };
 
-    const showDialog = (task) => {
+    const showDialog = (task) => { 
         setCurrentTask(task);
         setHideDialog(false);
     };
 
-    const closeDialog = () => {
+    const closeDialog = () => { 
         setHideDialog(true);
         setEditMode(false);
         setCurrentTask(null);
@@ -103,11 +85,16 @@ const TaskList = ({ tasks, deleteTask, editTask }) => {
         }
     };
 
-    const renderDialogContent = (task) => {
+    const handleSave = () => { 
+        editTask(currentTask.id, currentTask.title, currentTask.description, originalDeadline);
+        setEditMode(false);
+    }
+
+    const renderDialogContent = (task) => { 
         if (!task) return null;
 
         return (
-            <div>
+            <Stack tokens={{ childrenGap: 10 }}> 
                 <TextField
                     label="Task"
                     value={task.title}
@@ -132,40 +119,42 @@ const TaskList = ({ tasks, deleteTask, editTask }) => {
 
                 {hasDeadline && (
                     <TimePickerDateTimePicker
+                        readOnly={!editMode}
                         editData={!hideDialog}
-                        currentDeadLine={currentTask.deadline ? currentTask.deadline : new Date()}
+                        currentDeadLine={currentTask.deadline ? new Date(currentTask.deadline) : new Date()}
                         onSelectDateTime={(time) => { handleDeadlineChange(time) }}
                     />
                 )}
-            </div>
+            </Stack>
         );
     };
 
     return (
         <div>
-            <Stack horizontal wrap tokens={stackTokens}>
+            <Stack horizontal={isHorizontal} wrap tokens={stackTokens}> 
                 {tasks.map((task) => (
-                    <div key={task.id}>
-                        <TaskNote toDo={() => showDialog(task)}>
+                    <Stack.Item key={task.id} grow={isHorizontal}> 
+                        <TaskNote toDo={() => showDialog(task)}> 
                             {task.title}
                         </TaskNote>
-                    </div>
+                    </Stack.Item>
                 ))}
             </Stack>
 
             <DetailTaskDialog
-                hidden={hideDialog}
-                onDismiss={closeDialog}
-                dialogContent={dialogContent}
-                editMode={editMode}
-                setEditMode={confirmEditTasks}
-                openDeleteConfirmation={openDeleteConfirmation}
-                closeDialog={closeDialog}
+                hidden={hideDialog} 
+                onDismiss={closeDialog} 
+                dialogContent={dialogContent} 
+                editMode={editMode} 
+                setEditMode={setEditMode} 
+                openDeleteConfirmation={openDeleteConfirmation} 
+                closeDialog={closeDialog} 
+                onSave={handleSave} 
             />
             <DeleteConfirmationDialog
-                hidden={!showDeleteConfirmation}
-                onDismiss={closeDeleteConfirmation}
-                onConfirm={confirmDeleteTasks}
+                hidden={!showDeleteConfirmation} 
+                onDismiss={closeDeleteConfirmation} 
+                onConfirm={confirmDeleteTasks} 
             />
         </div>
     );

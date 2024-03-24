@@ -6,19 +6,19 @@ const InfiniteScroll = ({ children, loadMore }) => {
   useEffect(() => {
     const handleScroll = () => {
       const { scrollTop, clientHeight, scrollHeight } = scrollRef.current;
-      if (scrollHeight - scrollTop === clientHeight) {
+      if (scrollTop + clientHeight >= scrollHeight) {
         loadMore();
       }
     };
 
-    scrollRef.current.addEventListener('scroll', handleScroll);
+    scrollRef.current.addEventListener('scroll', handleScroll); 
     return () => {
-      scrollRef.current.removeEventListener('scroll', handleScroll);
+      scrollRef.current.removeEventListener('scroll', handleScroll); 
     };
   }, [loadMore]);
 
   return (
-    <div ref={scrollRef} style={{ height: '400px', overflowY: 'scroll' }}>
+    <div ref={scrollRef} style={{ height: 'calc(100vh - 377px)', padding:'0px 20px', overflowY: 'scroll' }}>
       {children}
     </div>
   );

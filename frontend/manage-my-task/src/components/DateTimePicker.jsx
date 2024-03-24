@@ -1,9 +1,9 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { TimePicker, DatePicker, Label, Text, Stack } from '@fluentui/react';
+import { TimePicker, DatePicker, Label, Stack, TextField } from '@fluentui/react';
 
-
+// Function to snap time to the updated date anchor
 const snapTimeToUpdatedDateAnchor = (datePickerDate, currentTime) => {
-  let snappedTime = new Date(currentTime);
+  let snappedTime = new Date(currentTime.toString());
 
   if (currentTime && !isNaN(currentTime.valueOf())) {
     const startAnchor = new Date(datePickerDate);
@@ -21,15 +21,16 @@ const snapTimeToUpdatedDateAnchor = (datePickerDate, currentTime) => {
   return snappedTime;
 };
 
-const TimePickerDateTimePicker = ({editData,currentDeadLine,onSelectDateTime}) => {
+const DateTimePicker = ({ readOnly, editData, currentDeadLine, onSelectDateTime }) => {
   const currentDate = editData ? currentDeadLine : new Date();
-  const [datePickerDate, setDatePickerDate] = useState(currentDate);
-  const [currentTime, setCurrentTime] = useState(currentDate);
+  const [datePickerDate, setDatePickerDate] = useState(currentDate); 
+  const [currentTime, setCurrentTime] = useState(currentDate); 
 
   useEffect(() => {
-    onSelectDateTime(currentDate); // Call onSelectDateTime with current date and time on component mount
+    onSelectDateTime(currentDate);
   }, []);
 
+  // Callback function for selecting date from DatePicker
   const onSelectDate = useCallback(
     (selectedDate) => {
       setDatePickerDate(selectedDate);
@@ -39,26 +40,36 @@ const TimePickerDateTimePicker = ({editData,currentDeadLine,onSelectDateTime}) =
         onSelectDateTime(snappedTime);
       }
     },
-    [currentTime,onSelectDateTime]
+    [currentTime, onSelectDateTime]
   );
 
+  // Callback function for time selection from TimePicker
   const onTimePickerChange = useCallback((_, date) => {
     setCurrentTime(date);
     onSelectDateTime(date);
   }, [onSelectDateTime]);
 
   return (
-    <Stack tokens={{ childrenGap: 10 }}>
-      <Label>{'Pick your deadline'}</Label>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridColumnGap: '3px' }}>
-        <DatePicker
-          showMonthPickerAsOverlay
-          value={datePickerDate}
-          onSelectDate={onSelectDate}
-          ariaLabel="Date picker"
-          minDate={currentDate}
-        />
+    <Stack tokens={{ childrenGap: 2 }}>
+      <Label>{readOnly ? 'Deadline' : 'Pick your deadline'}</Label> 
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridColumnGap: '3px' }}> 
+        {readOnly ? (
+          <TextField
+            readOnly
+            value={currentDate ? currentDate.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: '2-digit', year: 'numeric' }) : ''}
+            ariaLabel="Date picker"
+          />
+        ) : (
+          <DatePicker
+            showMonthPickerAsOverlay
+            value={datePickerDate}
+            onSelectDate={onSelectDate}
+            ariaLabel="Date picker"
+            minDate={new Date()}
+          />
+        )}
         <TimePicker
+          style={readOnly ? { pointerEvents: 'none' } : {}}
           placeholder="Select a time"
           dateAnchor={datePickerDate}
           value={currentTime}
@@ -71,4 +82,4 @@ const TimePickerDateTimePicker = ({editData,currentDeadLine,onSelectDateTime}) =
   );
 };
 
-export default TimePickerDateTimePicker;
+export default DateTimePicker;
