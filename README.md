@@ -10,20 +10,37 @@ Thank you for your interest in my project! This repository contains the code for
      git clone https://github.com/kyuzan22/kitameraki_recruitment_kyuzan22.git
      ```
 
-2. **Install Dependencies:**
-   - Navigate to the `backend` folder and install the required Node.js modules by running:
+2. **Navigate to the Project Directory and Switch to the Active Project Branch:**
+   - Enter the project directory using the following command:
+     ```
+     cd kitameraki_recruitment_kyuzan22
+     ```
+
+   - Ensure you're in the correct branch by switching to `part_one` branch:
+     ```
+     git checkout part_one
+     ```
+
+3. **Install Dependencies:**
+   - Navigate to the backend directory:
      ```
      cd backend
+     ```
+   - Install backend dependencies:
+     ```
      npm install
      ```
 
-   - Similarly, navigate to the `frontend/manage-my-task` folder and install the necessary dependencies by running:
+   - Navigate to the frontend/manage-my-task directory:
      ```
      cd ../frontend/manage-my-task
+     ```
+   - Install frontend dependencies:
+     ```
      npm install
      ```
 
-3. **Run the Servers:**
+4. **Run the Servers:**
    - In the `backend` directory, start the backend server by running:
      ```
      node server.js
@@ -34,7 +51,7 @@ Thank you for your interest in my project! This repository contains the code for
      npm run dev
      ```
 
-4. **Access the Application:**
+5. **Access the Application:**
    - Once both servers are running, open your web browser and navigate to the following address:
      ```
      http://localhost:5173/
